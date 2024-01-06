@@ -115,7 +115,7 @@ module "slurm_cluster" {
   compute_startup_scripts = [
     {
       filename = "compute-setup-sssd.sh"
-      content  = file("${path.module}/scripts/controller-login-sssd.sh")
+      content  = file("${path.module}/scripts/compute-setup-sssd.sh")
     },
   ]
 
@@ -124,6 +124,10 @@ module "slurm_cluster" {
       filename = "controller-login-sssd.sh"
       content  = file("${path.module}/scripts/controller-login-sssd.sh")
     },
+    {
+      filename = "makeuser.sh"
+      content  = file("${path.module}/scripts/makeuser.sh")
+    }
   ]
 
 }
