@@ -18,10 +18,10 @@
 # GENERAL #
 ###########
 
-project_id = "<PROJECT_ID>"
+project_id = "tpu-cluster"
 
-slurm_cluster_name = "simple"
+slurm_cluster_name = "test"
 
-region = "us-central1"
+region = "us-central2"
 
-zone = "us-central1-b"
+zone = "us-central2-b"
