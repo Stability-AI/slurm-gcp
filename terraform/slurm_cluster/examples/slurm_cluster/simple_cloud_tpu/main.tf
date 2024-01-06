@@ -25,30 +25,32 @@ locals {
     machine_type    = "n1-standard-4"
     service_account = module.slurm_sa_iam["controller"].service_account
     subnetwork      = data.google_compute_subnetwork.default.self_link
+    enable_public_ip = true
   }
 
   login_nodes = [
     {
       group_name = "l0"
-
+      num_instances = 2
       disk_size_gb    = 32
       disk_type       = "pd-standard"
       machine_type    = "n1-standard-2"
       service_account = module.slurm_sa_iam["login"].service_account
       subnetwork      = data.google_compute_subnetwork.default.self_link
+      enable_public_ip = true
     }
   ]
   nodeset_tpu = [
     {
-      nodeset_name           = "v2x8"
-      node_type              = "v2-8"
-      tf_version             = "2.12.0"
+      nodeset_name           = "v4x8"
+      node_type              = "v4-8"
+      tf_version             = "2.14.0"
       zone                   = var.zone
       preemptible            = true
       preserve_tpu           = true
       enable_public_ip       = true
-      node_count_dynamic_max = 20
-      node_count_static      = 0
+      node_count_dynamic_max = 0
+      node_count_static      = 8
       subnetwork             = data.google_compute_subnetwork.default.self_link
       service_account        = module.slurm_sa_iam["compute"].service_account
     },
@@ -59,8 +61,9 @@ locals {
       partition_conf = {
         Default = "YES"
       }
-      partition_name        = "debug"
+      partition_name        = "test"
       partition_nodeset_tpu = [local.nodeset_tpu[0].nodeset_name]
+      resume_timeout        = 900
     },
   ]
 }
@@ -101,6 +104,28 @@ module "slurm_cluster" {
     module.slurm_firewall_rules,
     module.slurm_sa_iam,
   ]
+
+  controller_startup_scripts = [
+    {
+      filename = "controller-login-sssd.sh"
+      content  = file("${path.module}/scripts/controller-login-sssd.sh")
+    },
+  ]
+
+  compute_startup_scripts = [
+    {
+      filename = "compute-setup-sssd.sh"
+      content  = file("${path.module}/scripts/controller-login-sssd.sh")
+    },
+  ]
+
+  login_startup_scripts = [
+    {
+      filename = "controller-login-sssd.sh"
+      content  = file("${path.module}/scripts/controller-login-sssd.sh")
+    },
+  ]
+
 }
 
 ##################
