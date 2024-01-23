@@ -2,7 +2,7 @@
 set -ex
 
 cat > /slurm/scripts/makeuser.sh <<FILE
-
+#!/bin/bash
 # Root does not need SSH key generation
 [ \${PAM_USER} == "root" ] && exit 0
 
@@ -40,6 +40,5 @@ FILE
 
 chmod +x /slurm/scripts/makeuser.sh
 echo 'session    optional     pam_exec.so log=/var/log/pam_ssh_key_generator.log /slurm/scripts/makeuser.sh' >> /etc/pam.d/sshd
-sed -i 's|/usr/bin/google_authorized_keys|/usr/bin/sss_ssh_authorizedkeys|g' /etc/ssh/sshd_config
 
 systemctl restart sshd

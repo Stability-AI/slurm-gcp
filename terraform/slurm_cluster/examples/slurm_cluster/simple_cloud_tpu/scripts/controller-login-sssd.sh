@@ -4,8 +4,22 @@ set -e
 set -o pipefail
 
 echo "Setup sssd connection to Active Directory via LDAP on `hostname`"
-
 sshd_config_file="/etc/ssh/sshd_config"
+
+echo ""
+echo "###################################################"
+echo "Step 2: Running apt-get update"
+echo "###################################################"
+sudo apt-get update -y
+echo "apt-get update finished..."
+
+echo ""
+echo "###################################################"
+echo "Step 3: Running apt-get upgrade"
+echo "###################################################"
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq sssd sssd-tools sssd-ldap openssh-server
+echo "required package installation complete..."
+
 
 if [ -d "/etc/sssd" ]
 then
@@ -63,6 +77,7 @@ echo "###################################################"
 echo "Step 4: ssh Auth setup"
 echo "###################################################"
 ## Allow password authentication for SSH
+sudo sed -i 's|/usr/bin/google_authorized_keys|/usr/bin/sss_ssh_authorizedkeys|g' /etc/ssh/sshd_config
 sudo sed -i 's/[#]AuthorizedKeysCommand .*/AuthorizedKeysCommand \/usr\/bin\/sss_ssh_authorizedkeys/' $sshd_config_file
 sudo sed -i 's/[#]AuthorizedKeysCommandUser .*/AuthorizedKeysCommandUser root/' $sshd_config_file
 sudo sed -i 's/[#]PasswordAuthentication .*/PasswordAuthentication no/' $sshd_config_file

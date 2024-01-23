@@ -26,6 +26,7 @@ locals {
     service_account = module.slurm_sa_iam["controller"].service_account
     subnetwork      = data.google_compute_subnetwork.default.self_link
     enable_public_ip = true
+    source_image_family = "slurm-gcp-6-3-ubuntu-2004-lts"
   }
 
   login_nodes = [
@@ -38,6 +39,7 @@ locals {
       service_account = module.slurm_sa_iam["login"].service_account
       subnetwork      = data.google_compute_subnetwork.default.self_link
       enable_public_ip = true
+      source_image_family = "slurm-gcp-6-3-ubuntu-2004-lts"
     }
   ]
   nodeset_tpu = [
@@ -46,11 +48,12 @@ locals {
       node_type              = "v4-8"
       tf_version             = "2.14.0"
       zone                   = var.zone
-      preemptible            = true
-      preserve_tpu           = true
+      preemptible            = false
+      preserve_tpu           = false
       enable_public_ip       = true
       node_count_dynamic_max = 0
       node_count_static      = 8
+      reserved               = true
       subnetwork             = data.google_compute_subnetwork.default.self_link
       service_account        = module.slurm_sa_iam["compute"].service_account
     },
